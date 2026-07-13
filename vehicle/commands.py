@@ -1,0 +1,14 @@
+"""
+Commands sent to ESP32
+"""
+
+
+FORWARD = "FORWARD"
+
+BACKWARD = "BACKWARD"
+
+LEFT = "LEFT"
+
+RIGHT = "RIGHT"
+
+STOP = "STOP"
