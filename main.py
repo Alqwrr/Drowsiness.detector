@@ -9,6 +9,7 @@ from src.eye_detection import *
 from src.drowsiness import DrowsinessDetector
 from src.alarm import Alarm
 from src.visualization import Visualizer
+from vehicle.vehicle_controller import VehicleController
 
 from interface.controls import VehicleControls
 from interface.dashboard import Dashboard
@@ -30,6 +31,16 @@ drowsiness = DrowsinessDetector()
 
 alarm = Alarm()
 
+vehicle = VehicleController()
+
+vehicle.connect()
+
+cv2.namedWindow("Vehicle Camera", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("Vehicle Camera", 800, 600)
+
+cv2.namedWindow("Driver Monitor", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("Driver Monitor", 900, 700)
+
 
 
 while True:
@@ -39,10 +50,10 @@ while True:
     start=time.time()
 
 
-    frame = camera.get_frame()
+    face_frame = camera.get_face_frame()
+    road_frame = camera.get_road_frame()
 
-
-    if frame is None:
+    if face_frame is None:
         break
 
     end = time.time()
@@ -52,7 +63,7 @@ while True:
 
 
 
-    results = mesh.process(frame)
+    results = mesh.process(face_frame)
 
     ear = 0
 
@@ -66,7 +77,7 @@ while True:
         face = results.multi_face_landmarks[0]
 
 
-        h,w,_ = frame.shape
+        h,w,_ = face_frame.shape
 
 
         left=[]
@@ -138,7 +149,7 @@ while True:
         command = "STOP"
 
         cv2.putText(
-            frame,
+            face_frame,
             "DROWSINESS WARNING",
             (20,230),
             cv2.FONT_HERSHEY_SIMPLEX,
@@ -147,8 +158,12 @@ while True:
             3
         )
 
-    frame = dashboard.draw(
-        frame,
+        vehicle.send(command)
+
+    vehicle.send(command)
+
+    face_frame = dashboard.draw(
+        face_frame,
         "DROWSY" if drowsy else "ACTIVE",
         command,
         ear,
@@ -158,9 +173,16 @@ while True:
 
 
     cv2.imshow(
-        "Driver Monitor",
-        frame
+    "Driver Monitor",
+    face_frame
     )
+
+    if road_frame is not None:
+
+        cv2.imshow(
+            "Vehicle Camera",
+            road_frame
+        )
 
 
 
@@ -169,7 +191,7 @@ while True:
         break
 
 
-
+vehicle.disconnect()
 camera.release()
 
 cv2.destroyAllWindows()

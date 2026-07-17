@@ -19,21 +19,25 @@ class VehicleControls:
             if key.char == "w":
 
                 self.command = "FORWARD"
+                print(self.command)
 
 
             elif key.char == "s":
 
                 self.command = "BACKWARD"
-
-
-            elif key.char == "a":
-
-                self.command = "LEFT"
+                print(self.command)
 
 
             elif key.char == "d":
 
+                self.command = "LEFT"
+                print(self.command)
+
+
+            elif key.char == "a":
+
                 self.command = "RIGHT"
+                print(self.command)
 
 
 
@@ -43,6 +47,7 @@ class VehicleControls:
             if key == keyboard.Key.space:
 
                 self.command = "STOP"
+                print(self.command)
 
 
 
